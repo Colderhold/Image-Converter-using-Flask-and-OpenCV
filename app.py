@@ -70,4 +70,4 @@ def edit():
             flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
             return render_template('index.html')
         
-    return render_template('index.html')
+    return render_template('index.html', flash_messages=flash.get_messages())
