@@ -4,7 +4,7 @@ import os
 import cv2
 import tempfile
 
-UPLOAD_FOLDER = 'uploads'
+UPLOAD_FOLDER = '/var/task/uploads'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
