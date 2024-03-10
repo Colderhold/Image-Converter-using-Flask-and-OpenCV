@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, flash, send_file
-from werkzeug.utils import secure_filename
 import os
 import cv2
 import tempfile
@@ -26,6 +25,8 @@ def processImage(temp_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
+    base_filename, _ = os.path.splitext(os.path.basename(temp_filename))
+
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     elif operation == 'cwebp':
@@ -40,8 +41,8 @@ def processImage(temp_filename, operation):
         print('Error: Operation not recognized.')
         return 'error'
 
-    # Create a temporary file to store the processed image
-    _, temp_output_filename = tempfile.mkstemp(suffix='.png')
+    # Create a temporary file to store the processed image with the original filename and the new extension
+    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{operation}')
     cv2.imwrite(temp_output_filename, imgProcessed)
 
     return temp_output_filename
@@ -71,6 +72,6 @@ def edit():
             temp_output_filename = processImage(temp_file.name, operation)
 
         # Send the processed image directly to the client
-        return send_file(temp_output_filename, as_attachment=True, download_name=f"processed_image.{operation}", mimetype='image/png')
+        return send_file(temp_output_filename, as_attachment=True, mimetype='image/png')
 
     return render_template('index.html', flash_messages=flash.get_messages())
