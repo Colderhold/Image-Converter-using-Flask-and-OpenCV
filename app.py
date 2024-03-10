@@ -85,6 +85,6 @@ def edit():
             return 'error'
         
         # Use the correct path for send_file
-        return send_file(new_filename, as_attachment=True)
+        return send_file(new_filename, as_attachment=True, attachment_filename=os.path.basename(new_filename))
     
     return render_template('index.html', flash_messages=flash.get_messages())
