@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, send_file
 from werkzeug.utils import secure_filename
 import os
 import cv2
@@ -15,8 +15,8 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def processImage(temp_filename, orig_filename, operation):
-    print(f'The operation is {operation} and filename is {orig_filename}')
+def processImage(temp_filename, operation):
+    print(f'The operation is {operation} and filename is {temp_filename}')
 
     # Load the image directly from the temporary file
     img = cv2.imread(temp_filename)
@@ -26,59 +26,25 @@ def processImage(temp_filename, orig_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
-    newfilename = f"static/{os.path.basename(orig_filename)}"
-    print(f'The new filename is: {newfilename}')
-
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"static/{os.path.basename(orig_filename)}"
-        print(f'The new filename is: {newfilename}')
-        if cv2.imwrite(newfilename, imgProcessed):
-            return newfilename
-        else:
-            print('Error: Image not saved.')
-            return 'error'
-
     elif operation == 'cwebp':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
-        print(f'The new filename is: {newfilename}')
-        if cv2.imwrite(newfilename, img):
-            return newfilename
-        else:
-            print('Error: Image not saved.')
-            return 'error'
-
+        imgProcessed = img  # No need to process for webp
     elif operation == 'cjpg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
-        print(f'The new filename is: {newfilename}')
-        if cv2.imwrite(newfilename, img):
-            return newfilename
-        else:
-            print('Error: Image not saved.')
-            return 'error'
-
+        imgProcessed = img  # No need to process for jpg
     elif operation == 'cjpeg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
-        print(f'The new filename is: {newfilename}')
-        if cv2.imwrite(newfilename, img):
-            return newfilename
-        else:
-            print('Error: Image not saved.')
-            return 'error'
-
+        imgProcessed = img  # No need to process for jpeg
     elif operation == 'cpng':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
-        print(f'The new filename is: {newfilename}')
-        if cv2.imwrite(newfilename, img):
-            return newfilename
-        else:
-            print('Error: Image not saved.')
-            return 'error'
-
+        imgProcessed = img  # No need to process for png
     else:
-        # Handle the case where operation is not recognized
         print('Error: Operation not recognized.')
         return 'error'
+
+    # Create a temporary file to store the processed image
+    _, temp_output_filename = tempfile.mkstemp(suffix='.png')
+    cv2.imwrite(temp_output_filename, imgProcessed)
+
+    return temp_output_filename
 
 @app.route('/')
 def home():
@@ -98,16 +64,13 @@ def edit():
         if file.filename == '':
             flash('No selected file')
             return 'error no selected file'
-
+        
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            new = processImage(temp_file.name, file.filename, operation)
+            temp_output_filename = processImage(temp_file.name, operation)
 
-            # Clean up the temporary file
-            os.remove(temp_file.name)
-
-        flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
-        return render_template('index.html')
+        # Send the processed image directly to the client
+        return send_file(temp_output_filename, as_attachment=True)
 
     return render_template('index.html', flash_messages=flash.get_messages())
