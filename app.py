@@ -7,7 +7,7 @@ import tempfile
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg'}
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'super secret key'
 
@@ -76,6 +76,9 @@ def edit():
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
             new = processImage(temp_file.name, operation)
+            
+            # Clean up the temporary file
+            os.remove(temp_file.name)
         
         flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
         return render_template('index.html')
