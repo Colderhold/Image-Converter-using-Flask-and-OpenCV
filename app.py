@@ -17,33 +17,36 @@ def allowed_file(filename):
 def processImage(filename, operation):
     print(f'The operation is {operation} and filename is {filename}')
     img = cv2.imread(f'uploads/{filename}')
-    match operation:
-        case 'cgray':
-            imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            newfilename = f"static/{filename}"
-            cv2.imwrite(newfilename, imgProcessed)
-            return newfilename
-        
-        case 'cwebp':
-            newfilename = f"static/{filename.split('.')[0]}.webp"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cjpg':
-            newfilename = f"static/{filename.split('.')[0]}.jpg"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cjpeg':
-            newfilename = f"static/{filename.split('.')[0]}.jpeg"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cpng':
-            newfilename = f"static/{filename.split('.')[0]}.png"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-    pass
+
+    if operation == 'cgray':
+        imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        newfilename = f"static/{filename}"
+        cv2.imwrite(newfilename, imgProcessed)
+        return newfilename
+
+    elif operation == 'cwebp':
+        newfilename = f"static/{filename.split('.')[0]}.webp"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cjpg':
+        newfilename = f"static/{filename.split('.')[0]}.jpg"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cjpeg':
+        newfilename = f"static/{filename.split('.')[0]}.jpeg"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cpng':
+        newfilename = f"static/{filename.split('.')[0]}.png"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    else:
+        # Handle the case where operation is not recognized
+        return 'error'
 
 @app.route('/')
 def home():
