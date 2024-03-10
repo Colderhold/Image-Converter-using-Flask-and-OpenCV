@@ -52,7 +52,7 @@ def processImage(filename, operation):
 def home():
     return render_template('index.html')
 
-@app.route('/edit', methods=['POST'])
+@app.route('/edit', methods=['GET', 'POST'])
 def edit():
     if request.method == 'POST':
         operation = request.form.get('operation')
