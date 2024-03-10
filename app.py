@@ -25,31 +25,29 @@ def processImage(orig_filename, temp_filename, operation):
         # Handle the case where the image could not be loaded
         return 'error'
 
+    base_filename, file_extension = os.path.splitext(orig_filename)
+    output_filename = f"static/{base_filename}.{file_extension}"
+
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"static/{os.path.basename(orig_filename)}"
-        cv2.imwrite(newfilename, imgProcessed)
-        return newfilename
+        cv2.imwrite(output_filename, imgProcessed)
+        return output_filename
 
     elif operation == 'cwebp':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
-        cv2.imwrite(newfilename, img)
-        return newfilename
+        cv2.imwrite(output_filename, img)
+        return output_filename
 
     elif operation == 'cjpg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
-        cv2.imwrite(newfilename, img)
-        return newfilename
+        cv2.imwrite(output_filename, img)
+        return output_filename
 
     elif operation == 'cjpeg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
-        cv2.imwrite(newfilename, img)
-        return newfilename
+        cv2.imwrite(output_filename, img)
+        return output_filename
 
     elif operation == 'cpng':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
-        cv2.imwrite(newfilename, img)
-        return newfilename
+        cv2.imwrite(output_filename, img)
+        return output_filename
 
     else:
         # Handle the case where operation is not recognized
