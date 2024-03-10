@@ -66,11 +66,16 @@ def edit():
             return 'error no selected file'
         
         # Use a temporary directory for file storage
-        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-            file.save(temp_file.name)
-            temp_output_filename = processImage(temp_file.name, operation)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as temp_file:
+            temp_output_filename = processImage(file.filename, temp_file.name, operation)
+            
+            # Clean up the temporary file
+            os.remove(temp_file.name)
+            
+            if temp_output_filename == 'error':
+                flash('Error: Image not saved.')
+                return 'error'
 
-        # Send the processed image directly to the client
-        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
+            return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
 
     return render_template('index.html', flash_messages=flash.get_messages())
