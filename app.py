@@ -67,22 +67,26 @@ def edit():
         if 'file' not in request.files:
             flash('No file part')
             return 'error'
+
         file = request.files['file']
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
             return 'error no selected file'
-        
+
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
             new = processImage(temp_file.name, operation)
-            
             # Clean up the temporary file
             os.remove(temp_file.name)
-        
-        flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
+
+        if new != 'error':
+            flash(f"Your image has been converted and is available <a href='{url_for('static', filename=new)}' target='_blank'>here</a>")
+        else:
+            flash("An error occurred while processing the image.")
+
         return render_template('index.html')
-    
+
     return render_template('index.html', flash_messages=flash.get_messages())
