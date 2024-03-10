@@ -16,34 +16,53 @@ def allowed_file(filename):
 
 def processImage(filename, operation):
     print(f'The operation is {operation} and filename is {filename}')
-    img = cv2.imread(f'uploads/{filename}')
-    match operation:
-        case 'cgray':
-            imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            newfilename = f"static/{filename}"
-            cv2.imwrite(newfilename, imgProcessed)
-            return newfilename
-        
-        case 'cwebp':
-            newfilename = f"static/{filename.split('.')[0]}.webp"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cjpg':
-            newfilename = f"static/{filename.split('.')[0]}.jpg"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cjpeg':
-            newfilename = f"static/{filename.split('.')[0]}.jpeg"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-        
-        case 'cpng':
-            newfilename = f"static/{filename.split('.')[0]}.png"
-            cv2.imwrite(newfilename, img)
-            return newfilename
-    pass
+    img_path = f'uploads/{filename}'
+    print(f'Image path: {img_path}')
+    if not os.path.exists(img_path):
+        print('Image not found')
+        return 'error'
+    
+    img = cv2.imread(img_path)
+    
+    if img is None:
+        print('Failed to read the image')
+        return 'error'
+    
+    try:
+        match operation:
+            case 'cgray':
+                imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+                newfilename = f"static/{filename}"
+                cv2.imwrite(newfilename, imgProcessed)
+                print(f'Image processed and saved at: {newfilename}')
+                return newfilename
+            
+            case 'cwebp':
+                newfilename = f"static/{filename.split('.')[0]}.webp"
+                cv2.imwrite(newfilename, img)
+                print(f'Image processed and saved at: {newfilename}')
+                return newfilename
+            
+            case 'cjpg':
+                newfilename = f"static/{filename.split('.')[0]}.jpg"
+                cv2.imwrite(newfilename, img)
+                print(f'Image processed and saved at: {newfilename}')
+                return newfilename
+            
+            case 'cjpeg':
+                newfilename = f"static/{filename.split('.')[0]}.jpeg"
+                cv2.imwrite(newfilename, img)
+                print(f'Image processed and saved at: {newfilename}')
+                return newfilename
+            
+            case 'cpng':
+                newfilename = f"static/{filename.split('.')[0]}.png"
+                cv2.imwrite(newfilename, img)
+                print(f'Image processed and saved at: {newfilename}')
+                return newfilename
+    except Exception as e:
+        print(f'Error processing image: {e}')
+        return 'error'
 
 @app.route('/')
 def home():
@@ -72,5 +91,6 @@ def edit():
         
     return render_template('index.html', flash_messages=flash.get_messages())
 
+# Run the app if it's not imported as a module
 if __name__ == '__main__':
     app.run(debug=True)
