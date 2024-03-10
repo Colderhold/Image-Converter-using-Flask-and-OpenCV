@@ -68,9 +68,14 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            temp_output_filename = processImage(temp_file.name, operation)
-
-        # Send the processed image directly to the client
-        return send_file(temp_output_filename, as_attachment=True, download_name=f"processed_image.{operation}", mimetype='image/png')
-
+            new = processImage(temp_file.name, operation)
+            
+            # Clean up the temporary file
+            os.remove(temp_file.name)
+            
+        temp_output_filename = f"static/{os.path.basename(new)}"
+        
+        # The modified return statement
+        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
+    
     return render_template('index.html', flash_messages=flash.get_messages())
