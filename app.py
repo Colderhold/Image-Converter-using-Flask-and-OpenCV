@@ -15,11 +15,11 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def processImage(orig_filename, operation):
+def processImage(temp_filename, orig_filename, operation):
     print(f'The operation is {operation} and filename is {orig_filename}')
 
-    # Load the image directly using the original filename
-    img = cv2.imread(f'uploads/{orig_filename}')
+    # Load the image directly from the temporary file
+    img = cv2.imread(temp_filename)
 
     if img is None:
         # Handle the case where the image could not be loaded
@@ -41,6 +41,7 @@ def processImage(orig_filename, operation):
 
     elif operation == 'cwebp':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
+        print(f'The new filename is: {newfilename}')
         if cv2.imwrite(newfilename, img):
             return newfilename
         else:
@@ -49,6 +50,7 @@ def processImage(orig_filename, operation):
 
     elif operation == 'cjpg':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
+        print(f'The new filename is: {newfilename}')
         if cv2.imwrite(newfilename, img):
             return newfilename
         else:
@@ -57,6 +59,7 @@ def processImage(orig_filename, operation):
 
     elif operation == 'cjpeg':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
+        print(f'The new filename is: {newfilename}')
         if cv2.imwrite(newfilename, img):
             return newfilename
         else:
@@ -65,6 +68,7 @@ def processImage(orig_filename, operation):
 
     elif operation == 'cpng':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
+        print(f'The new filename is: {newfilename}')
         if cv2.imwrite(newfilename, img):
             return newfilename
         else:
