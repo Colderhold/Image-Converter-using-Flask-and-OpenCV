@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, flash
 from werkzeug.utils import secure_filename
 import os
 import cv2
+import tempfile
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg'}
@@ -52,7 +53,7 @@ def processImage(filename, operation):
 def home():
     return render_template('index.html')
 
-@app.route('/edit', methods=['GET', 'POST'])
+@app.route('/edit', methods=['POST'])
 def edit():
     if request.method == 'POST':
         operation = request.form.get('operation')
@@ -66,11 +67,13 @@ def edit():
         if file.filename == '':
             flash('No selected file')
             return 'error no selected file'
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            new = processImage(filename, operation)
-            flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
-            return render_template('index.html')
         
+        # Use a temporary directory for file storage
+        with tempfile.NamedTemporaryFile(delete=False) as temp_file:
+            file.save(temp_file.name)
+            new = processImage(temp_file.name, operation)
+        
+        flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
+        return render_template('index.html')
+    
     return render_template('index.html', flash_messages=flash.get_messages())
