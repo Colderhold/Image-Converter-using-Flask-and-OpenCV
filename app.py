@@ -15,7 +15,7 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def processImage(orig_filename, temp_filename, operation):
+def processImage(temp_filename, operation):
     print(f'The operation is {operation} and filename is {temp_filename}')
 
     # Load the image directly from the temporary file
@@ -23,37 +23,28 @@ def processImage(orig_filename, temp_filename, operation):
 
     if img is None:
         # Handle the case where the image could not be loaded
+        print('Error: Image not loaded.')
         return 'error'
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"static/{os.path.basename(orig_filename)}"
-        cv2.imwrite(newfilename, imgProcessed)
-        return newfilename
-
     elif operation == 'cwebp':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
-        cv2.imwrite(newfilename, img)
-        return newfilename
-
+        imgProcessed = img  # No need to process for webp
     elif operation == 'cjpg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
-        cv2.imwrite(newfilename, img)
-        return newfilename
-
+        imgProcessed = img  # No need to process for jpg
     elif operation == 'cjpeg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
-        cv2.imwrite(newfilename, img)
-        return newfilename
-
+        imgProcessed = img  # No need to process for jpeg
     elif operation == 'cpng':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
-        cv2.imwrite(newfilename, img)
-        return newfilename
-
+        imgProcessed = img  # No need to process for png
     else:
-        # Handle the case where operation is not recognized
+        print('Error: Operation not recognized.')
         return 'error'
+
+    # Create a temporary file to store the processed image
+    _, temp_output_filename = tempfile.mkstemp(suffix='.png')
+    cv2.imwrite(temp_output_filename, imgProcessed)
+
+    return temp_output_filename
 
 @app.route('/')
 def home():
@@ -77,15 +68,14 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            new_filename = processImage(file.filename, temp_file.name, operation)
+            new = processImage(temp_file.name, operation)
             
             # Clean up the temporary file
             os.remove(temp_file.name)
+            
+        temp_output_filename = f"static/{os.path.basename(new)}"
         
-        if new_filename == 'error':
-            flash('Error processing image')
-            return 'error'
-        
-        return send_file(new_filename, as_attachment=True)
+        # The modified return statement
+        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
     
     return render_template('index.html', flash_messages=flash.get_messages())
