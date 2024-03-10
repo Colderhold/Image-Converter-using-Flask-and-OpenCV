@@ -25,7 +25,7 @@ def processImage(temp_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
-    base_filename, original_extension = os.path.splitext(os.path.basename(temp_filename))
+    base_filename, file_extension = os.path.splitext(os.path.basename(temp_filename))
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -46,15 +46,15 @@ def processImage(temp_filename, operation):
         print('Error: Operation not recognized.')
         return 'error'
 
-    # Create a temporary file to store the processed image in a common format
+    # Create a temporary file to store the processed image
     _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
     cv2.imwrite(temp_output_filename, imgProcessed)
 
     # Rename the file to include the desired extension
-    final_output_filename = os.path.join(os.path.dirname(temp_output_filename), f'{base_filename}.{operation}.{output_extension}')
+    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{operation}.{output_extension}')
 
-    # Rename the file using shutil.move  
-    shutil.move(temp_output_filename, final_output_filename)
+    # Rename the file
+    os.rename(temp_output_filename, final_output_filename)
 
     return final_output_filename
 
