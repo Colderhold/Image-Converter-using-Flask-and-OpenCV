@@ -57,8 +57,10 @@ def processImage(orig_filename, temp_filename, operation):
         return 'error'
 
     if os.path.exists(newfilename):
+        print(os.getcwd())
         print("Image saved successfully.")
     else:
+        print(os.getcwd())
         print("Error: Image not saved.")
 
     return newfilename
