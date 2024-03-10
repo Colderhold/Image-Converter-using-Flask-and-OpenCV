@@ -17,31 +17,35 @@ def allowed_file(filename):
 
 def processImage(filename, operation):
     print(f'The operation is {operation} and filename is {filename}')
-    img = cv2.imread(f'uploads/{filename}')
+    img = cv2.imread(filename)  # Use the provided filename directly
+
+    if img is None:
+        # Handle the case where the image could not be loaded
+        return 'error'
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"static/{filename}"
+        newfilename = f"static/{os.path.basename(filename)}"
         cv2.imwrite(newfilename, imgProcessed)
         return newfilename
 
     elif operation == 'cwebp':
-        newfilename = f"static/{filename.split('.')[0]}.webp"
+        newfilename = f"static/{os.path.basename(filename).split('.')[0]}.webp"
         cv2.imwrite(newfilename, img)
         return newfilename
 
     elif operation == 'cjpg':
-        newfilename = f"static/{filename.split('.')[0]}.jpg"
+        newfilename = f"static/{os.path.basename(filename).split('.')[0]}.jpg"
         cv2.imwrite(newfilename, img)
         return newfilename
 
     elif operation == 'cjpeg':
-        newfilename = f"static/{filename.split('.')[0]}.jpeg"
+        newfilename = f"static/{os.path.basename(filename).split('.')[0]}.jpeg"
         cv2.imwrite(newfilename, img)
         return newfilename
 
     elif operation == 'cpng':
-        newfilename = f"static/{filename.split('.')[0]}.png"
+        newfilename = f"static/{os.path.basename(filename).split('.')[0]}.png"
         cv2.imwrite(newfilename, img)
         return newfilename
 
