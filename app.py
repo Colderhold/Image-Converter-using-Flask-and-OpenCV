@@ -71,6 +71,6 @@ def edit():
             temp_output_filename = processImage(temp_file.name, operation)
 
         # Send the processed image directly to the client
-        return send_file(temp_output_filename, as_attachment=True)
+        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
 
     return render_template('index.html', flash_messages=flash.get_messages())
