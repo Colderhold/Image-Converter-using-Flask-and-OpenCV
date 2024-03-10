@@ -2,11 +2,10 @@
   "version": 2,
   "builds": [
       {
-          "src": "./app.py",
+          "src": "./index.py",
           "use": "@vercel/python",
           "config": {
-              "runtime": "python3.10",
-              "maxLambdaSize": "15mb"
+              "runtime": "python3.10"
           }
       }
   ],
