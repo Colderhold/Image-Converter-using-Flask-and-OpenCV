@@ -71,3 +71,6 @@ def edit():
             return render_template('index.html')
         
     return render_template('index.html', flash_messages=flash.get_messages())
+
+if __name__ == '__main__':
+    app.run(debug=True)
