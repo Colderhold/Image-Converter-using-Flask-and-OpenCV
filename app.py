@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash, send_from_directory
+from flask import Flask, render_template, request, flash, send_file
 from werkzeug.utils import secure_filename
 import os
 import cv2
@@ -12,7 +12,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'super secret key'
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def processImage(orig_filename, temp_filename, operation):
     print(f'The operation is {operation} and filename is {temp_filename}')
@@ -26,11 +27,29 @@ def processImage(orig_filename, temp_filename, operation):
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"/tmp/{os.path.basename(orig_filename)}"
+        newfilename = f"static/{os.path.basename(orig_filename)}"
         cv2.imwrite(newfilename, imgProcessed)
         return newfilename
 
-    # ... (other cases)
+    elif operation == 'cwebp':
+        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cjpg':
+        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cjpeg':
+        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
+        cv2.imwrite(newfilename, img)
+        return newfilename
+
+    elif operation == 'cpng':
+        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
+        cv2.imwrite(newfilename, img)
+        return newfilename
 
     else:
         # Handle the case where operation is not recognized
@@ -58,16 +77,15 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            new = processImage(file.filename, temp_file.name, operation)
+            new_filename = processImage(file.filename, temp_file.name, operation)
             
             # Clean up the temporary file
             os.remove(temp_file.name)
         
-        flash(f"Your image has been converted and is available <a href='/{new}' target='_blank'> here</a>")
-        return render_template('index.html')
+        if new_filename == 'error':
+            flash('Error processing image')
+            return 'error'
+        
+        return send_file(new_filename, as_attachment=True)
     
     return render_template('index.html', flash_messages=flash.get_messages())
-
-@app.route('/static/<filename>')
-def uploaded_file(filename):
-    return send_from_directory('static', filename, as_attachment=True)
