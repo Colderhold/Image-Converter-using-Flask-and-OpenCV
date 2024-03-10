@@ -25,29 +25,30 @@ def processImage(orig_filename, temp_filename, operation):
         # Handle the case where the image could not be loaded
         return 'error'
 
+    newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename)}")
+
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        newfilename = f"static/{os.path.basename(orig_filename)}"
         cv2.imwrite(newfilename, imgProcessed)
         print(f"The new filename is: {newfilename}")
 
     elif operation == 'cwebp':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
+        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.webp")
         cv2.imwrite(newfilename, img)
         print(f"The new filename is: {newfilename}")
 
     elif operation == 'cjpg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
+        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg")
         cv2.imwrite(newfilename, img)
         print(f"The new filename is: {newfilename}")
 
     elif operation == 'cjpeg':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
+        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg")
         cv2.imwrite(newfilename, img)
         print(f"The new filename is: {newfilename}")
 
     elif operation == 'cpng':
-        newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
+        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.png")
         cv2.imwrite(newfilename, img)
         print(f"The new filename is: {newfilename}")
 
@@ -59,6 +60,9 @@ def processImage(orig_filename, temp_filename, operation):
         print("Image saved successfully.")
     else:
         print("Error: Image not saved.")
+
+    return newfilename
+
 
 @app.route('/')
 def home():
