@@ -79,13 +79,22 @@ def edit():
         if file.filename == '':
             flash('No selected file')
             return 'error no selected file'
-        
+
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
             temp_output_filename = processImage(temp_file.name, operation)
 
+        # Determine the MIME type based on the operation
+        mime_type = {
+            'cgray': 'image/png',
+            'cwebp': 'image/webp',
+            'cjpg': 'image/jpeg',
+            'cjpeg': 'image/jpeg',
+            'cpng': 'image/png'
+        }.get(operation, 'image/png')
+
         # Send the processed image directly to the client with the original filename
-        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename, mimetype='image/png')
+        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename, mimetype=mime_type)
 
     return render_template('index.html', flash_messages=flash.get_messages())
