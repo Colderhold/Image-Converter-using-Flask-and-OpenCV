@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request, flash, send_file, shutil
-import os
+from flask import Flask, render_template, request, flash, send_file
+import os, shutil
 import cv2
 import tempfile
 
