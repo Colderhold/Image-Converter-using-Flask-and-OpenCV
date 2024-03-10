@@ -25,7 +25,7 @@ def processImage(temp_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
-    base_filename, _ = os.path.splitext(os.path.basename(temp_filename))
+    base_filename, original_extension = os.path.splitext(os.path.basename(temp_filename))
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -51,7 +51,7 @@ def processImage(temp_filename, operation):
     cv2.imwrite(temp_output_filename, imgProcessed)
 
     # Rename the file to include the desired extension
-    final_output_filename = os.path.splitext(temp_filename)[0] + f'.{operation}'
+    final_output_filename = f'{base_filename}.{operation}.{output_extension}'
 
     # Rename the file
     os.rename(temp_output_filename, final_output_filename)
