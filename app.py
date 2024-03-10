@@ -29,23 +29,34 @@ def processImage(temp_filename, operation):
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        output_extension = 'png'
     elif operation == 'cwebp':
         imgProcessed = img  # No need to process for webp
+        output_extension = 'webp'
     elif operation == 'cjpg':
         imgProcessed = img  # No need to process for jpg
+        output_extension = 'jpg'
     elif operation == 'cjpeg':
         imgProcessed = img  # No need to process for jpeg
+        output_extension = 'jpeg'
     elif operation == 'cpng':
         imgProcessed = img  # No need to process for png
+        output_extension = 'png'
     else:
         print('Error: Operation not recognized.')
         return 'error'
 
-    # Create a temporary file to store the processed image with the original filename and the new extension
-    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{operation}')
+    # Create a temporary file to store the processed image in a common format
+    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
     cv2.imwrite(temp_output_filename, imgProcessed)
 
-    return temp_output_filename
+    # Rename the file to include the desired extension
+    final_output_filename = os.path.splitext(temp_output_filename)[0] + f'.{operation}'
+
+    # Rename the file
+    os.rename(temp_output_filename, final_output_filename)
+
+    return final_output_filename
 
 @app.route('/')
 def home():
