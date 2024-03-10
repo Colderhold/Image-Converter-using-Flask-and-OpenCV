@@ -51,9 +51,9 @@ def processImage(temp_filename, operation):
     cv2.imwrite(temp_output_filename, imgProcessed)
 
     # Rename the file to include the desired extension
-    final_output_filename = f'{base_filename}.{operation}.{output_extension}'
+    final_output_filename = os.path.join(os.path.dirname(temp_output_filename), f'{base_filename}.{operation}.{output_extension}')
 
-    # Rename the file using shutil.move
+    # Rename the file using shutil.move  
     shutil.move(temp_output_filename, final_output_filename)
 
     return final_output_filename
