@@ -77,7 +77,7 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            new = processImage(temp_file.name, operation)
+            new = processImage(file.filename, temp_file.name, operation)
             
             # Clean up the temporary file
             os.remove(temp_file.name)
