@@ -29,31 +29,36 @@ def processImage(orig_filename, temp_filename, operation):
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         newfilename = f"static/{os.path.basename(orig_filename)}"
         cv2.imwrite(newfilename, imgProcessed)
-        return newfilename
+        print(f"The new filename is: {newfilename}")
 
     elif operation == 'cwebp':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.webp"
         cv2.imwrite(newfilename, img)
-        return newfilename
+        print(f"The new filename is: {newfilename}")
 
     elif operation == 'cjpg':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg"
         cv2.imwrite(newfilename, img)
-        return newfilename
+        print(f"The new filename is: {newfilename}")
 
     elif operation == 'cjpeg':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
         cv2.imwrite(newfilename, img)
-        return newfilename
+        print(f"The new filename is: {newfilename}")
 
     elif operation == 'cpng':
         newfilename = f"static/{os.path.basename(orig_filename).split('.')[0]}.png"
         cv2.imwrite(newfilename, img)
-        return newfilename
+        print(f"The new filename is: {newfilename}")
 
     else:
         # Handle the case where operation is not recognized
         return 'error'
+
+    if os.path.exists(newfilename):
+        print("Image saved successfully.")
+    else:
+        print("Error: Image not saved.")
 
 @app.route('/')
 def home():
@@ -77,12 +82,12 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            new = processImage(file.filename, temp_file.name, operation)
+            processImage(file.filename, temp_file.name, operation)
             
             # Clean up the temporary file
             os.remove(temp_file.name)
         
-        flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
+        flash(f"Your image has been converted and is available <a href='/static/{os.path.basename(file.filename)}' target='_blank'> here</a>")
         return render_template('index.html')
     
     return render_template('index.html', flash_messages=flash.get_messages())
