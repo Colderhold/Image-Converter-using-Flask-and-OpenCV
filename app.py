@@ -84,6 +84,7 @@ def edit():
             flash('Error processing image')
             return 'error'
         
+        # Use the correct path for send_file
         return send_file(new_filename, as_attachment=True)
     
     return render_template('index.html', flash_messages=flash.get_messages())
