@@ -26,28 +26,28 @@ def processImage(orig_filename, temp_filename, operation):
         return 'error'
 
     base_filename, file_extension = os.path.splitext(orig_filename)
-    output_filename = f"static/{base_filename}.{file_extension}"
+    output_filename = f"static/{base_filename}"
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        cv2.imwrite(output_filename, imgProcessed)
-        return output_filename
+        cv2.imwrite(f"{output_filename}.png", imgProcessed)
+        return f"{output_filename}.png"
 
     elif operation == 'cwebp':
-        cv2.imwrite(output_filename, img)
-        return output_filename
+        cv2.imwrite(f"{output_filename}.webp", img)
+        return f"{output_filename}.webp"
 
     elif operation == 'cjpg':
-        cv2.imwrite(output_filename, img)
-        return output_filename
+        cv2.imwrite(f"{output_filename}.jpg", img)
+        return f"{output_filename}.jpg"
 
     elif operation == 'cjpeg':
-        cv2.imwrite(output_filename, img)
-        return output_filename
+        cv2.imwrite(f"{output_filename}.jpeg", img)
+        return f"{output_filename}.jpeg"
 
     elif operation == 'cpng':
-        cv2.imwrite(output_filename, img)
-        return output_filename
+        cv2.imwrite(f"{output_filename}.png", img)
+        return f"{output_filename}.png"
 
     else:
         # Handle the case where operation is not recognized
