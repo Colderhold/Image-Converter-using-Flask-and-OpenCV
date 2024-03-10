@@ -4,7 +4,7 @@ import os
 import cv2
 import tempfile
 
-UPLOAD_FOLDER = '/var/task/uploads'
+UPLOAD_FOLDER = '/tmp'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
@@ -25,46 +25,35 @@ def processImage(orig_filename, temp_filename, operation):
         # Handle the case where the image could not be loaded
         return 'error'
 
-    newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename)}")
-
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        newfilename = f"/tmp/{os.path.basename(orig_filename)}"
         cv2.imwrite(newfilename, imgProcessed)
-        print(f"The new filename is: {newfilename}")
+        return newfilename
 
     elif operation == 'cwebp':
-        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.webp")
+        newfilename = f"/tmp/{os.path.basename(orig_filename).split('.')[0]}.webp"
         cv2.imwrite(newfilename, img)
-        print(f"The new filename is: {newfilename}")
+        return newfilename
 
     elif operation == 'cjpg':
-        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.jpg")
+        newfilename = f"/tmp/{os.path.basename(orig_filename).split('.')[0]}.jpg"
         cv2.imwrite(newfilename, img)
-        print(f"The new filename is: {newfilename}")
+        return newfilename
 
     elif operation == 'cjpeg':
-        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.jpeg")
+        newfilename = f"/tmp/{os.path.basename(orig_filename).split('.')[0]}.jpeg"
         cv2.imwrite(newfilename, img)
-        print(f"The new filename is: {newfilename}")
+        return newfilename
 
     elif operation == 'cpng':
-        newfilename = os.path.join(app.config['UPLOAD_FOLDER'], f"static/{os.path.basename(orig_filename).split('.')[0]}.png")
+        newfilename = f"/tmp/{os.path.basename(orig_filename).split('.')[0]}.png"
         cv2.imwrite(newfilename, img)
-        print(f"The new filename is: {newfilename}")
+        return newfilename
 
     else:
         # Handle the case where operation is not recognized
         return 'error'
-
-    if os.path.exists(newfilename):
-        print(os.getcwd())
-        print("Image saved successfully.")
-    else:
-        print(os.getcwd())
-        print("Error: Image not saved.")
-
-    return newfilename
-
 
 @app.route('/')
 def home():
@@ -88,12 +77,12 @@ def edit():
         # Use a temporary directory for file storage
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             file.save(temp_file.name)
-            processImage(file.filename, temp_file.name, operation)
+            new = processImage(temp_file.name, file.filename, operation)
             
             # Clean up the temporary file
             os.remove(temp_file.name)
         
-        flash(f"Your image has been converted and is available <a href='/static/{os.path.basename(file.filename)}' target='_blank'> here</a>")
+        flash(f"Your image has been converted and is available <a href='/{new}'target='_blank'> here</a>")
         return render_template('index.html')
     
     return render_template('index.html', flash_messages=flash.get_messages())
