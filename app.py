@@ -76,6 +76,6 @@ def edit():
         temp_output_filename = f"static/{os.path.basename(new)}"
         
         # The modified return statement
-        return send_file(temp_output_filename, as_attachment=True, download_name=file.filename)
+        return send_file(temp_output_filename, as_attachment=True, download_name=f"processed_image.{operation}", mimetype='image/png')
     
     return render_template('index.html', flash_messages=flash.get_messages())
