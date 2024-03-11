@@ -48,13 +48,12 @@ def processImage(temp_filename, operation):
 
     # Create a temporary file to store the processed image
     _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
-    imgProcessed.save(temp_output_filename)
 
-    # Create a new filename with the desired extension
-    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
+    # Manipulate the filename to include the desired extension
+    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{operation}.{output_extension}')
 
-    # Rename the temporary file to the final filename
-    os.rename(temp_output_filename, final_output_filename)
+    # Save the processed image with the manipulated filename
+    imgProcessed.save(final_output_filename)
 
     return final_output_filename
 
