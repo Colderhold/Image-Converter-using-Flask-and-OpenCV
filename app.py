@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, flash, send_file
 from PIL import Image
-import os, shutil
+import os
+import shutil
 import tempfile
 
 UPLOAD_FOLDER = 'uploads'
@@ -53,14 +54,10 @@ def processImage(temp_filename, operation):
     # Create a new filename with the desired extension
     final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
 
-    # Copy the file to the new filename
-    shutil.copy2(temp_output_filename, final_output_filename)
-
-    # Remove the temporary file
-    os.remove(temp_output_filename)
+    # Move the file to the new filename
+    shutil.move(temp_output_filename, final_output_filename)
 
     return final_output_filename
-
 
 @app.route('/')
 def home():
