@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, flash, send_file
 from PIL import Image
-import os
+import os, shutil
 import tempfile
 
 UPLOAD_FOLDER = 'uploads'
@@ -17,7 +17,7 @@ def allowed_file(filename):
 def processImage(temp_filename, operation):
     print(f'The operation is {operation} and filename is {temp_filename}')
 
-    # Open the image using Pillow
+    # Load the image directly from the temporary file
     img = Image.open(temp_filename)
 
     if img is None:
@@ -25,19 +25,19 @@ def processImage(temp_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
-    base_filename, file_extension = os.path.splitext(os.path.basename(temp_filename))
+    base_filename, _ = os.path.splitext(os.path.basename(temp_filename))
 
     if operation == 'cgray':
-        imgProcessed = img.convert('L')
+        imgProcessed = img.convert('L')  # Convert to grayscale
         output_extension = 'png'
     elif operation == 'cwebp':
         imgProcessed = img  # No need to process for webp
         output_extension = 'webp'
     elif operation == 'cjpg':
-        imgProcessed = img  # No need to process for jpg
+        imgProcessed = img.convert('RGB')  # Convert to RGB
         output_extension = 'jpg'
     elif operation == 'cjpeg':
-        imgProcessed = img  # No need to process for jpeg
+        imgProcessed = img.convert('RGB')  # Convert to RGB
         output_extension = 'jpeg'
     elif operation == 'cpng':
         imgProcessed = img  # No need to process for png
@@ -47,10 +47,20 @@ def processImage(temp_filename, operation):
         return 'error'
 
     # Create a temporary file to store the processed image
-    temp_output_filename = tempfile.mktemp(suffix=f'.{output_extension}')
+    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
     imgProcessed.save(temp_output_filename)
 
-    return temp_output_filename
+    # Create a new filename with the desired extension
+    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
+
+    # Copy the file to the new filename
+    shutil.copy2(temp_output_filename, final_output_filename)
+
+    # Remove the temporary file
+    os.remove(temp_output_filename)
+
+    return final_output_filename
+
 
 @app.route('/')
 def home():
