@@ -25,30 +25,35 @@ def processImage(temp_filename, operation):
         print('Error: Image not loaded.')
         return 'error'
 
-    base_filename, original_extension = os.path.splitext(os.path.basename(temp_filename))
+    base_filename, file_extension = os.path.splitext(os.path.basename(temp_filename))
 
     if operation == 'cgray':
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        output_extension = 'png'
     elif operation == 'cwebp':
-        imgProcessed = img
+        imgProcessed = img  # No need to process for webp
+        output_extension = 'webp'
     elif operation == 'cjpg':
-        imgProcessed = img
+        imgProcessed = img  # No need to process for jpg
+        output_extension = 'jpg'
     elif operation == 'cjpeg':
-        imgProcessed = img
+        imgProcessed = img  # No need to process for jpeg
+        output_extension = 'jpeg'
     elif operation == 'cpng':
-        imgProcessed = img
+        imgProcessed = img  # No need to process for png
+        output_extension = 'png'
     else:
         print('Error: Operation not recognized.')
         return 'error'
 
-    # Create a temporary file to store the processed image in a consistent format (e.g., PNG)
-    _, temp_output_filename = tempfile.mkstemp(suffix='.png')
+    # Create a temporary file to store the processed image
+    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
     cv2.imwrite(temp_output_filename, imgProcessed)
 
-    # Keep the original filename with its extension
-    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}{original_extension}')
+    # Create a new filename with the desired extension
+    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
 
-    # Rename the file to the original filename with its extension
+    # Rename the file to include the desired extension
     os.rename(temp_output_filename, final_output_filename)
 
     return final_output_filename
