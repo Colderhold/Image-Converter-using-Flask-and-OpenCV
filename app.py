@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, flash, send_file
-import os, shutil
+import os
 import cv2
 import tempfile
+import shutil
 
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'webp', 'png', 'jpg', 'jpeg'}
@@ -31,36 +32,30 @@ def processImage(temp_filename, operation):
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         output_extension = 'png'
     elif operation == 'cwebp':
-        _, imgProcessed = cv2.imencode('.webp', img)
+        imgProcessed = img
         output_extension = 'webp'
     elif operation == 'cjpg':
-        _, imgProcessed = cv2.imencode('.jpg', img)
-        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
+        imgProcessed = img
         output_extension = 'jpg'
     elif operation == 'cjpeg':
-        _, imgProcessed = cv2.imencode('.jpeg', img)
-        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
+        imgProcessed = img
         output_extension = 'jpeg'
     elif operation == 'cpng':
-        _, imgProcessed = cv2.imencode('.png', img)
-        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
+        imgProcessed = img
         output_extension = 'png'
     else:
         print('Error: Operation not recognized.')
         return 'error'
 
     # Create a temporary file to store the processed image
-    _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
+    _, temp_output_filename = tempfile.mkstemp(suffix='.png')
     cv2.imwrite(temp_output_filename, imgProcessed)
 
     # Create a new filename with the desired extension
     final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
 
-    # Copy the file to the new filename
-    shutil.copy2(temp_output_filename, final_output_filename)
-
-    # Remove the temporary file
-    os.remove(temp_output_filename)
+    # Move the file to the new filename with the desired extension
+    shutil.move(temp_output_filename, final_output_filename)
 
     return final_output_filename
 
@@ -92,7 +87,7 @@ def edit():
         mime_type = {
             'cgray': 'image/png',
             'cwebp': 'image/webp',
-            'cjpg': 'image/jpg',
+            'cjpg': 'image/jpeg',
             'cjpeg': 'image/jpeg',
             'cpng': 'image/png'
         }.get(operation, 'image/png')
