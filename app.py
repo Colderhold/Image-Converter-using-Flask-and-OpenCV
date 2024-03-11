@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request, flash, send_file
 from PIL import Image
-from pywebp import webp
-import os
+import os, shutil
 import tempfile
 
 UPLOAD_FOLDER = 'uploads'
@@ -12,8 +11,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = 'super secret key'
 
 def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def processImage(temp_filename, operation):
     print(f'The operation is {operation} and filename is {temp_filename}')
@@ -27,15 +25,40 @@ def processImage(temp_filename, operation):
         return 'error'
 
     base_filename, _ = os.path.splitext(os.path.basename(temp_filename))
-    output_extension = 'webp' if operation == 'cwebp' else 'webp'
+
+    if operation == 'cgray':
+        imgProcessed = img.convert('L')  # Convert to grayscale
+        output_extension = 'png'
+    elif operation == 'cwebp':
+        imgProcessed = img  # No need to process for webp
+        output_extension = 'webp'
+    elif operation == 'cjpg':
+        imgProcessed = img.convert('RGB')  # Convert to RGB
+        output_extension = 'jpg'
+    elif operation == 'cjpeg':
+        imgProcessed = img.convert('RGB')  # Convert to RGB
+        output_extension = 'jpeg'
+    elif operation == 'cpng':
+        imgProcessed = img  # No need to process for png
+        output_extension = 'png'
+    else:
+        print('Error: Operation not recognized.')
+        return 'error'
 
     # Create a temporary file to store the processed image
     _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
+    imgProcessed.save(temp_output_filename)
 
-    # Save the processed image in webp format
-    img.save(temp_output_filename, 'WEBP')
+    # Create a new filename with the desired extension
+    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{output_extension}')
 
-    return temp_output_filename
+    # Copy the file to the new filename
+    shutil.copy2(temp_output_filename, final_output_filename)
+
+    # Remove the temporary file
+    os.remove(temp_output_filename)
+
+    return final_output_filename
 
 @app.route('/')
 def home():
@@ -74,4 +97,3 @@ def edit():
         return send_file(temp_output_filename, as_attachment=True, download_name=file.filename, mimetype=mime_type)
 
     return render_template('index.html', flash_messages=flash.get_messages())
-
