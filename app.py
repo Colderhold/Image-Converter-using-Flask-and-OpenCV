@@ -31,16 +31,19 @@ def processImage(temp_filename, operation):
         imgProcessed = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         output_extension = 'png'
     elif operation == 'cwebp':
-        imgProcessed = cv2.imencode('.webp', img)[1]
+        _, imgProcessed = cv2.imencode('.webp', img)
         output_extension = 'webp'
     elif operation == 'cjpg':
         _, imgProcessed = cv2.imencode('.jpg', img)
+        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
         output_extension = 'jpg'
     elif operation == 'cjpeg':
         _, imgProcessed = cv2.imencode('.jpeg', img)
+        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
         output_extension = 'jpeg'
     elif operation == 'cpng':
         _, imgProcessed = cv2.imencode('.png', img)
+        imgProcessed = cv2.imdecode(imgProcessed, cv2.IMREAD_COLOR)
         output_extension = 'png'
     else:
         print('Error: Operation not recognized.')
@@ -89,7 +92,7 @@ def edit():
         mime_type = {
             'cgray': 'image/png',
             'cwebp': 'image/webp',
-            'cjpg': 'image/jpeg',
+            'cjpg': 'image/jpg',
             'cjpeg': 'image/jpeg',
             'cpng': 'image/png'
         }.get(operation, 'image/png')
