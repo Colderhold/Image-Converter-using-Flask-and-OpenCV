@@ -74,3 +74,4 @@ def edit():
         return send_file(temp_output_filename, as_attachment=True, download_name=file.filename, mimetype=mime_type)
 
     return render_template('index.html', flash_messages=flash.get_messages())
+
