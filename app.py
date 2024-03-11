@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, send_file
 from PIL import Image
+from pywebp import webp
 import os
 import tempfile
 
@@ -26,36 +27,15 @@ def processImage(temp_filename, operation):
         return 'error'
 
     base_filename, _ = os.path.splitext(os.path.basename(temp_filename))
-
-    if operation == 'cgray':
-        imgProcessed = img.convert('L')  # Convert to grayscale
-        output_extension = 'png'
-    elif operation == 'cwebp':
-        imgProcessed = img  # No need to process for webp
-        output_extension = 'webp'
-    elif operation == 'cjpg':
-        imgProcessed = img.convert('RGB')  # Convert to RGB
-        output_extension = 'jpg'
-    elif operation == 'cjpeg':
-        imgProcessed = img.convert('RGB')  # Convert to RGB
-        output_extension = 'jpeg'
-    elif operation == 'cpng':
-        imgProcessed = img  # No need to process for png
-        output_extension = 'png'
-    else:
-        print('Error: Operation not recognized.')
-        return 'error'
+    output_extension = 'webp' if operation == 'cwebp' else 'webp'
 
     # Create a temporary file to store the processed image
     _, temp_output_filename = tempfile.mkstemp(suffix=f'.{output_extension}')
 
-    # Manipulate the filename to include the desired extension
-    final_output_filename = os.path.join(os.path.dirname(temp_filename), f'{base_filename}.{operation}.{output_extension}')
+    # Save the processed image in webp format
+    img.save(temp_output_filename, 'WEBP')
 
-    # Save the processed image with the manipulated filename
-    imgProcessed.save(final_output_filename)
-
-    return final_output_filename
+    return temp_output_filename
 
 @app.route('/')
 def home():
