@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, send_file
 from PIL import Image
+from resizeimage import resizeimage
 import os
 import tempfile
 

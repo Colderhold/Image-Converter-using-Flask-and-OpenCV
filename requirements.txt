@@ -1,3 +1,5 @@
 Flask
 Werkzeug
-Pillow==9.0.0
+opencv-python-headless
+Pillow==9.0.1
+python-resize-image==1.1.19
