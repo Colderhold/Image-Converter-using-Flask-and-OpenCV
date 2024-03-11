@@ -35,7 +35,7 @@ def processImage(temp_filename, operation):
         imgProcessed = img.convert('RGB')  # Convert to RGB
 
     # Create a temporary file to store the processed image
-    _, temp_output_filename = tempfile.mkstemp(suffix=file_extension)
+    _, temp_output_filename = tempfile.mkstemp(suffix=file_extension or '.png')
     imgProcessed.save(temp_output_filename)
 
     return temp_output_filename
